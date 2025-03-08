@@ -1,5 +1,6 @@
 package com.darwin.simplestore.repositories;
 
+import com.darwin.simplestore.TestcontainersConfiguration;
 import com.darwin.simplestore.dto.ProductCategory;
 import com.darwin.simplestore.entities.Cart;
 import com.darwin.simplestore.entities.CartItem;
@@ -9,11 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 import java.util.Set;
@@ -21,7 +19,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Testcontainers
+@Import(TestcontainersConfiguration.class)
 @DataJpaTest
 @ActiveProfiles("dev")
 public class CartTest {
@@ -32,24 +30,20 @@ public class CartTest {
     @Autowired
     private CartItemRepository cartItemRepository;
 
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest");
-
     @BeforeEach
     public void setUp() {
         Product product1 = new Product();
         product1.setName("p1");
         product1.setDescription("d1");
         product1.setPrice(1.0);
-        product1.setQuantity(10);
+        product1.setQuantity(10L);
         product1.setCategory(ProductCategory.OTHER);
 
         Product product2 = new Product();
         product2.setName("p2");
         product2.setDescription("d2");
         product2.setPrice(1.0);
-        product2.setQuantity(10);
+        product2.setQuantity(10L);
         product2.setCategory(ProductCategory.FOOD);
 
         productRepository.save(product1);
