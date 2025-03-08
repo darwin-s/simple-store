@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      POSTGRES_DB: ${DB_NAME:-simplestore}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+    ports:
+      - '${DB_PORT:-5432}:${DB_PORT:-5432}'
