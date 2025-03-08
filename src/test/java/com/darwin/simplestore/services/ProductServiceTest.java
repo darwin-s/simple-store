@@ -1,0 +1,303 @@
+package com.darwin.simplestore.services;
+
+import com.darwin.simplestore.dto.NewProductDto;
+import com.darwin.simplestore.dto.ProductCategory;
+import com.darwin.simplestore.dto.ProductDto;
+import com.darwin.simplestore.entities.Product;
+import com.darwin.simplestore.exceptions.ResourceExistsException;
+import com.darwin.simplestore.exceptions.ResourceNotFoundException;
+import com.darwin.simplestore.repositories.ProductRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+
+@ExtendWith(MockitoExtension.class)
+@ActiveProfiles("dev")
+public class ProductServiceTest {
+    @Mock
+    private ProductRepository productRepository;
+
+    @InjectMocks
+    private ProductService productService;
+
+    @Test
+    public void testCreateProduct() {
+        final NewProductDto newProductDto = new NewProductDto(
+                "tst",
+                "tstDesc",
+                1.0,
+                3L,
+                ProductCategory.OTHER
+        );
+        final Product product = ProductService.fromNewProductDto(newProductDto);
+        product.setId(1L);
+
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        ProductDto productDto = assertDoesNotThrow(() -> productService.createProduct(newProductDto));
+
+        assertEquals(1L, productDto.id());
+        assertEquals("tst", productDto.name());
+        assertEquals("tstDesc", productDto.description());
+        assertEquals(1.0, productDto.price());
+        assertEquals(3, productDto.quantity());
+        assertEquals(ProductCategory.OTHER, productDto.category());
+
+        verify(productRepository, times(1)).save(any(Product.class));
+    }
+
+    @Test
+    public void testCreateProductException() {
+        final NewProductDto newProductDto = new NewProductDto(
+                "tst",
+                "tstDesc",
+                1.0,
+                3L,
+                ProductCategory.OTHER
+        );
+
+        when(productRepository.existsByName(anyString())).thenReturn(true);
+
+        assertThrowsExactly(ResourceExistsException.class, () -> productService.createProduct(newProductDto));
+
+        verify(productRepository, times(1)).existsByName(anyString());
+    }
+
+    @Test
+    public void testGetAllProducts() {
+        final List<Product> products = List.of(
+                new Product(
+                        1L,
+                        "p1",
+                        "d1",
+                        1.0,
+                        2L,
+                        ProductCategory.OTHER
+                ),
+                new Product(
+                        2L,
+                        "p2",
+                        "d2",
+                        1.0,
+                        2L,
+                        ProductCategory.OTHER
+                )
+        );
+
+        when(productRepository.findAll()).thenReturn(products);
+
+        final List<ProductDto> expectedProducts = products.stream().map(ProductService::toProductDto).toList();
+        final List<ProductDto> productDtos = productService.getAllProducts();
+
+        assertEquals(expectedProducts, productDtos);
+
+        verify(productRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void testGetProducts() {
+        final Product p1 = new Product(
+                1L,
+                "p1",
+                "d1",
+                1.0,
+                2L,
+                ProductCategory.OTHER);
+        final Product p2 = new Product(
+                2L,
+                "p2",
+                "d2",
+                1.0,
+                2L,
+                ProductCategory.OTHER);
+
+        final Pageable pageable1 = PageRequest.of(0, 1);
+        final Pageable pageable2 = PageRequest.of(1, 1);
+        final Page<Product> p1Page = new PageImpl<>(List.of(p1), pageable1, 1);
+        final Page<Product> p2Page = new PageImpl<>(List.of(p2), pageable2, 1);
+
+        when(productRepository.findAll(pageable1)).thenReturn(p1Page);
+        when(productRepository.findAll(pageable2)).thenReturn(p2Page);
+
+        Page<ProductDto> firstPage = productService.getProducts(pageable1);
+
+        assertEquals(1, firstPage.getNumberOfElements());
+        assertEquals(1L, firstPage.get().findFirst().get().id());
+
+        Page<ProductDto> secondPage = productService.getProducts(pageable2);
+
+        assertEquals(1, secondPage.getNumberOfElements());
+        assertEquals(2L, secondPage.get().findFirst().get().id());
+
+        verify(productRepository, times(2)).findAll(any(Pageable.class));
+    }
+
+    @Test
+    public void testGetProductById() {
+        final Product product = new Product(
+                1L,
+                "p1",
+                "d1",
+                1.0,
+                2L,
+                ProductCategory.OTHER);
+
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
+
+        ProductDto productDto = assertDoesNotThrow(() -> productService.getProductById(1L));
+        assertEquals(1L, productDto.id());
+
+        verify(productRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    public void testGetProductByIdException() {
+        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrowsExactly(ResourceNotFoundException.class, () -> productService.getProductById(1L));
+
+        verify(productRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    public void testGetProductByName() {
+        final Product product = new Product(
+                1L,
+                "p1",
+                "d1",
+                1.0,
+                2L,
+                ProductCategory.OTHER);
+
+        when(productRepository.findByName(anyString())).thenReturn(Optional.of(product));
+
+        ProductDto productDto = assertDoesNotThrow(() -> productService.getProductByName("p1"));
+        assertEquals(1L, productDto.id());
+
+        verify(productRepository, times(1)).findByName(anyString());
+    }
+
+    @Test
+    public void testGetProductByNameException() {
+        when(productRepository.findByName(anyString())).thenReturn(Optional.empty());
+
+        assertThrowsExactly(ResourceNotFoundException.class, () -> productService.getProductByName("p1"));
+
+        verify(productRepository, times(1)).findByName(anyString());
+    }
+
+    @Test
+    public void testUpdateProductById() {
+        final Product product = mock(Product.class);
+        when(product.getId()).thenReturn(1L);
+
+        when(productRepository.existsById(anyLong())).thenReturn(true);
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        assertDoesNotThrow(() -> productService.updateProductById(ProductService.toProductDto(product)));
+
+        verify(product, times(1)).getId();
+        verify(productRepository, times(1)).existsById(anyLong());
+        verify(productRepository, times(1)).save(any(Product.class));
+    }
+
+    @Test
+    public void testUpdateProductByIdException() {
+        final Product product = mock(Product.class);
+        when(product.getId()).thenReturn(1L);
+
+        when(productRepository.existsById(anyLong())).thenReturn(false);
+
+        assertThrowsExactly(ResourceNotFoundException.class, () -> productService.updateProductById(ProductService.toProductDto(product)));
+
+        verify(product, times(1)).getId();
+        verify(productRepository, times(1)).existsById(anyLong());
+    }
+
+    @Test
+    public void testUpdateProductByName() {
+        final Product product = mock(Product.class);
+        when(product.getName()).thenReturn("p1");
+
+        when(productRepository.findByName(anyString())).thenReturn(Optional.of(product));
+        when(productRepository.existsByName(anyString())).thenReturn(true);
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        assertDoesNotThrow(() -> productService.updateProductByName(ProductService.toProductDto(product)));
+
+        verify(product, times(1)).getName();
+        verify(productRepository, times(1)).existsByName(anyString());
+        verify(productRepository, times(1)).existsByName(anyString());
+        verify(productRepository, times(1)).save(any(Product.class));
+    }
+
+    @Test
+    public void testUpdateProductByNameException() {
+        final Product product = new Product(
+                1L,
+                "p1",
+                "d1",
+                1.0,
+                2L,
+                ProductCategory.OTHER);
+
+        when(productRepository.existsById(anyLong())).thenReturn(false);
+
+        assertThrowsExactly(ResourceNotFoundException.class, () -> productService.updateProductById(ProductService.toProductDto(product)));
+
+        verify(productRepository, times(1)).existsById(anyLong());
+    }
+
+    @Test
+    public void testDeleteProductById() {
+        when(productRepository.existsById(anyLong())).thenReturn(true);
+
+        assertDoesNotThrow(() -> productService.deleteProductById(1L));
+
+        verify(productRepository, times(1)).existsById(anyLong());
+        verify(productRepository, times(1)).deleteById(anyLong());
+    }
+
+    @Test
+    public void testDeleteProductByIdException() {
+        when(productRepository.existsById(anyLong())).thenReturn(false);
+
+        assertThrowsExactly(ResourceNotFoundException.class, () -> productService.deleteProductById(1L));
+
+        verify(productRepository, times(1)).existsById(anyLong());
+    }
+
+    @Test
+    public void testDeleteProductByName() {
+        when(productRepository.existsByName(anyString())).thenReturn(true);
+
+        assertDoesNotThrow(() -> productService.deleteProductByName("p1"));
+
+        verify(productRepository, times(1)).existsByName(anyString());
+        verify(productRepository, times(1)).deleteByName(anyString());
+    }
+
+    @Test
+    public void testDeleteProductByNameException() {
+        when(productRepository.existsByName(anyString())).thenReturn(false);
+
+        assertThrowsExactly(ResourceNotFoundException.class, () -> productService.deleteProductByName("p1"));
+
+        verify(productRepository, times(1)).existsByName(anyString());
+    }
+}
