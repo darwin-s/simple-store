@@ -16,7 +16,7 @@ import java.net.URI;
  * Controller for managing carts and their items
  */
 @RestController
-@RequestMapping("carts")
+@RequestMapping("/carts")
 @RequiredArgsConstructor
 public class CartController {
     private final CartService cartService;
