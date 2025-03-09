@@ -28,13 +28,12 @@ public class OrderService {
 
     /**
      * Return whether all the products are available in the requested quantity
-     * @param orderId The id of the order
+     * @param cartId The id of the cart
      * @return True if there are enough products to satisfy the order, false otherwise
      * @throws ResourceNotFoundException If there is no order with the provided id
      */
-    public boolean allProductsAvailable(Long orderId) throws ResourceNotFoundException {
-        final Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("No order found with id: " + orderId));
-        final Cart cart = order.getCart();
+    public boolean allProductsAvailable(Long cartId) throws ResourceNotFoundException {
+        final Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new ResourceNotFoundException("No cart found with id: " + cartId));
         final Set<CartItem> cartItems = cart.getCartItems();
 
         for (CartItem cartItem : cartItems) {

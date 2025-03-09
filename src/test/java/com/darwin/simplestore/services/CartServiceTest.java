@@ -67,6 +67,9 @@ public class CartServiceTest {
 
     @Test
     public void testClearCart() {
+        Cart cart = new Cart(1L, Collections.emptySet());
+
+        when(cartRepository.findById(anyLong())).thenReturn(Optional.of(cart));
         when(cartRepository.existsById(anyLong())).thenReturn(true);
 
         assertDoesNotThrow(() -> cartService.clearCart(1L));
@@ -86,6 +89,9 @@ public class CartServiceTest {
 
     @Test
     public void testDeleteCart() {
+        Cart cart = new Cart(1L, Collections.emptySet());
+
+        when(cartRepository.findById(anyLong())).thenReturn(Optional.of(cart));
         when(cartRepository.existsById(anyLong())).thenReturn(true);
 
         assertDoesNotThrow(() -> cartService.deleteCart(1L));

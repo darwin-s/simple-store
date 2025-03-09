@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -98,6 +99,9 @@ public class CartTest {
 
         cart.setCartItems(Set.of(cartItem1, cartItem2));
         cart = cartRepository.save(cart);
+
+        cart.setCartItems(Collections.emptySet());
+        cartRepository.save(cart);
 
         cartItemRepository.deleteAllByCartId(cart.getId());
         List<CartItem> cartItems = cartItemRepository.findAllByCart(cart);

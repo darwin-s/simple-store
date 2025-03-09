@@ -6,6 +6,7 @@ import com.darwin.simplestore.entities.Cart;
 import com.darwin.simplestore.exceptions.ResourceNotFoundException;
 import com.darwin.simplestore.repositories.CartItemRepository;
 import com.darwin.simplestore.repositories.CartRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -49,10 +50,15 @@ public class CartService {
      * @param id Id of the cart
      * @throws ResourceNotFoundException If a cart with such id does not exist
      */
+    @Transactional
     public void clearCart(Long id) throws ResourceNotFoundException {
         if (!cartRepository.existsById(id)) {
             throw new ResourceNotFoundException("No cart found with id: " + id);
         }
+
+        final Cart cart = cartRepository.findById(id).get();
+        cart.setCartItems(new HashSet<>());
+        cartRepository.save(cart);
 
         cartItemRepository.deleteAllByCartId(id);
     }
@@ -62,6 +68,7 @@ public class CartService {
      * @param id Id of the cart
      * @throws ResourceNotFoundException If a cart with such id does not exist
      */
+    @Transactional
     public void deleteCart(Long id) throws ResourceNotFoundException {
         clearCart(id);
 
