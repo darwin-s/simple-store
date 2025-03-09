@@ -72,10 +72,4 @@ public class ImageControllerTest {
                 .content(objectMapper.writeValueAsString(new NewImageDto("base64"))))
                 .andExpect(status().isOk());
     }
-
-    @Test
-    public void testDeleteImage() throws Exception {
-        mvc.perform(delete("/images/1"))
-                .andExpect(status().isOk());
-    }
 }

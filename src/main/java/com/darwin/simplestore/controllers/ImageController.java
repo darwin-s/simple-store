@@ -65,16 +65,4 @@ public class ImageController {
         imageService.updateImage(imageDto);
         return ResponseEntity.ok().build();
     }
-
-    /**
-     * Delete an image
-     * @param imageId The id of the image
-     * @return Response object
-     * @throws ResourceNotFoundException If the image could not be found
-     */
-    @DeleteMapping("/{imageId}")
-    public ResponseEntity<Void> deleteImage(@PathVariable final Long imageId) throws ResourceNotFoundException {
-        imageService.deleteImage(imageId);
-        return ResponseEntity.ok().build();
-    }
 }

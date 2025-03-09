@@ -9,6 +9,7 @@ import com.darwin.simplestore.exceptions.ResourceExistsException;
 import com.darwin.simplestore.exceptions.ResourceNotFoundException;
 import com.darwin.simplestore.repositories.ImageRepository;
 import com.darwin.simplestore.repositories.ProductRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -157,6 +158,7 @@ public class ProductService {
      * @return The image DTO
      * @throws ResourceNotFoundException If the product could not be found
      */
+    @Transactional
     public Optional<ImageDto> getImage(final Long productId) throws ResourceNotFoundException {
         final Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product with id " + productId + " does not exist"));
 

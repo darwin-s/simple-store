@@ -94,23 +94,4 @@ public class ImageServiceTest {
 
         verify(imageRepository, times(1)).existsById(anyLong());
     }
-
-    @Test
-    public void testDeleteImage() {
-        when(imageRepository.existsById(anyLong())).thenReturn(true);
-
-        assertDoesNotThrow(() -> imageService.deleteImage(image.getId()));
-
-        verify(imageRepository, times(1)).existsById(anyLong());
-        verify(imageRepository, times(1)).deleteById(anyLong());
-    }
-
-    @Test
-    public void testDeleteImageException() {
-        when(imageRepository.existsById(anyLong())).thenReturn(false);
-
-        assertThrowsExactly(ResourceNotFoundException.class, () -> imageService.deleteImage(image.getId()));
-
-        verify(imageRepository, times(1)).existsById(anyLong());
-    }
 }

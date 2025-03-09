@@ -54,19 +54,6 @@ public class ImageService {
     }
 
     /**
-     * Delete an image
-     * @param id The id of the image
-     * @throws ResourceNotFoundException If the requested image does not exist
-     */
-    public void deleteImage(final Long id) throws ResourceNotFoundException {
-        if (!imageRepository.existsById(id)) {
-            throw new ResourceNotFoundException("No image found with id: " + id);
-        }
-
-        imageRepository.deleteById(id);
-    }
-
-    /**
      * Convert a new image DTO to n entity
      * @param newImageDto The new image DTO
      * @return Entity for that DTO
