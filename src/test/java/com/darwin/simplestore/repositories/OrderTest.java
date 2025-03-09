@@ -40,14 +40,14 @@ public class OrderTest {
 
     @BeforeEach
     public void setUp() {
-        final Product product1 = new Product();
+        Product product1 = new Product();
         product1.setName("p1");
         product1.setDescription("d1");
         product1.setPrice(1.0);
         product1.setQuantity(10L);
         product1.setCategory(ProductCategory.OTHER);
 
-        final Product product2 = new Product();
+        Product product2 = new Product();
         product2.setName("p2");
         product2.setDescription("d2");
         product2.setPrice(1.0);
