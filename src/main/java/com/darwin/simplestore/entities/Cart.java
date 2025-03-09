@@ -13,6 +13,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "carts")
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
