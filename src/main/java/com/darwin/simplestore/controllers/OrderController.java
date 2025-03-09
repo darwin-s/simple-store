@@ -33,7 +33,7 @@ public class OrderController {
         final OrderDto orderDto = orderService.placeOrder(cartId);
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .path("{orderId}")
+                .path("/{orderId}")
                 .buildAndExpand(orderDto.id())
                 .toUri();
 
