@@ -21,6 +21,7 @@ public class Product {
     @Column(unique = true, nullable = false)
     private String name;
 
+    @Lob
     private String description;
     private Double price;
     private Long quantity;
