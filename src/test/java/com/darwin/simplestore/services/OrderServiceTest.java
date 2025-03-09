@@ -51,8 +51,6 @@ public class OrderServiceTest {
 
     private Cart cart;
     private Order order;
-    private CartItem cartItem1;
-    private CartItem cartItem2;
     private Product product1;
     private Product product2;
 
@@ -77,13 +75,13 @@ public class OrderServiceTest {
         cart = new Cart(1L,
                 null
         );
-        cartItem1 = new CartItem(
+        final CartItem cartItem1 = new CartItem(
                 1L,
                 10L,
                 cart,
                 product1
         );
-        cartItem2 = new CartItem(
+        final CartItem cartItem2 = new CartItem(
                 2L,
                 4L,
                 cart,
@@ -128,7 +126,7 @@ public class OrderServiceTest {
             return null;
         }).when(productService).updateProductById(any(ProductDto.class));
 
-        doAnswer(i -> {;
+        doAnswer(i -> {
             cart.setCartItems(Collections.emptySet());
             return null;
         }).when(cartService).clearCart(anyLong());

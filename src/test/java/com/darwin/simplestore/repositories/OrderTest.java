@@ -36,20 +36,18 @@ public class OrderTest {
     @Autowired
     private ProductRepository productRepository;
 
-    private Product product1;
-    private Product product2;
     private Cart cart;
 
     @BeforeEach
     public void setUp() {
-        product1 = new Product();
+        final Product product1 = new Product();
         product1.setName("p1");
         product1.setDescription("d1");
         product1.setPrice(1.0);
         product1.setQuantity(10L);
         product1.setCategory(ProductCategory.OTHER);
 
-        product2 = new Product();
+        final Product product2 = new Product();
         product2.setName("p2");
         product2.setDescription("d2");
         product2.setPrice(1.0);
