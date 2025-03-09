@@ -1,5 +1,6 @@
 package com.darwin.simplestore.controllers;
 
+import com.darwin.simplestore.dto.ImageDto;
 import com.darwin.simplestore.dto.NewProductDto;
 import com.darwin.simplestore.dto.ProductDto;
 import com.darwin.simplestore.exceptions.ResourceExistsException;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Optional;
 
 /**
  * Controller for managing products
@@ -110,6 +112,46 @@ public class ProductsController {
     @DeleteMapping("/{productId}")
     public ResponseEntity<Void> deleteProduct(@PathVariable final Long productId) throws ResourceNotFoundException {
         productService.deleteProductById(productId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Set an image for the product
+     * @param productId The id of the product
+     * @param imageId The id of the image
+     * @return Response object
+     * @throws ResourceNotFoundException If the product or the image could not be found
+     */
+    @PutMapping("/{productId}/image")
+    public ResponseEntity<Void> setImage(@PathVariable final Long productId, @RequestParam final Long imageId) throws ResourceNotFoundException {
+        productService.setImage(productId, imageId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Get the image for a product
+     * @param productId The id of the product
+     * @return The image DTO associated with the product or 404
+     * @throws ResourceNotFoundException If the product could not be found
+     */
+    @GetMapping("/{productId}/image")
+    public ResponseEntity<ImageDto> getImage(@PathVariable final Long productId) throws ResourceNotFoundException {
+        final Optional<ImageDto> imageDto = productService.getImage(productId);
+
+        return imageDto.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Remove the image from a product
+     * @param productId The id of the product
+     * @return Response object
+     * @throws ResourceNotFoundException If the product could not be found
+     */
+    @DeleteMapping("/{productId}/image")
+    public ResponseEntity<Void> deleteImage(@PathVariable final Long productId) throws ResourceNotFoundException {
+        productService.removeImage(productId);
 
         return ResponseEntity.ok().build();
     }
