@@ -20,6 +20,6 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Lob
+    @Column(length = 4194304)
     private String base64Image;
 }
