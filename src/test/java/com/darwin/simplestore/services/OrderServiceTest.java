@@ -62,7 +62,8 @@ public class OrderServiceTest {
                 "d1",
                 5.0,
                 10L,
-                ProductCategory.OTHER
+                ProductCategory.OTHER,
+                null
         );
         product2 = new Product(
                 2L,
@@ -70,7 +71,8 @@ public class OrderServiceTest {
                 "d2",
                 5.0,
                 5L,
-                ProductCategory.OTHER
+                ProductCategory.OTHER,
+                null
         );
         cart = new Cart(1L,
                 null

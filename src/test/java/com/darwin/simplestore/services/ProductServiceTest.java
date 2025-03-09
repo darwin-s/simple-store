@@ -3,9 +3,11 @@ package com.darwin.simplestore.services;
 import com.darwin.simplestore.dto.NewProductDto;
 import com.darwin.simplestore.dto.ProductCategory;
 import com.darwin.simplestore.dto.ProductDto;
+import com.darwin.simplestore.entities.Image;
 import com.darwin.simplestore.entities.Product;
 import com.darwin.simplestore.exceptions.ResourceExistsException;
 import com.darwin.simplestore.exceptions.ResourceNotFoundException;
+import com.darwin.simplestore.repositories.ImageRepository;
 import com.darwin.simplestore.repositories.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +33,9 @@ import static org.mockito.Mockito.*;
 public class ProductServiceTest {
     @Mock
     private ProductRepository productRepository;
+
+    @Mock
+    private ImageRepository imageRepository;
 
     @InjectMocks
     private ProductService productService;
@@ -87,7 +92,8 @@ public class ProductServiceTest {
                         "d1",
                         1.0,
                         2L,
-                        ProductCategory.OTHER
+                        ProductCategory.OTHER,
+                        null
                 ),
                 new Product(
                         2L,
@@ -95,7 +101,8 @@ public class ProductServiceTest {
                         "d2",
                         1.0,
                         2L,
-                        ProductCategory.OTHER
+                        ProductCategory.OTHER,
+                        null
                 )
         );
 
@@ -117,14 +124,16 @@ public class ProductServiceTest {
                 "d1",
                 1.0,
                 2L,
-                ProductCategory.OTHER);
+                ProductCategory.OTHER,
+                null);
         final Product p2 = new Product(
                 2L,
                 "p2",
                 "d2",
                 1.0,
                 2L,
-                ProductCategory.OTHER);
+                ProductCategory.OTHER,
+                null);
 
         final Pageable pageable1 = PageRequest.of(0, 1);
         final Pageable pageable2 = PageRequest.of(1, 1);
@@ -155,7 +164,8 @@ public class ProductServiceTest {
                 "d1",
                 1.0,
                 2L,
-                ProductCategory.OTHER);
+                ProductCategory.OTHER,
+                null);
 
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
 
@@ -182,7 +192,8 @@ public class ProductServiceTest {
                 "d1",
                 1.0,
                 2L,
-                ProductCategory.OTHER);
+                ProductCategory.OTHER,
+                null);
 
         when(productRepository.findByName(anyString())).thenReturn(Optional.of(product));
 
@@ -254,7 +265,8 @@ public class ProductServiceTest {
                 "d1",
                 1.0,
                 2L,
-                ProductCategory.OTHER);
+                ProductCategory.OTHER,
+                null);
 
         when(productRepository.existsById(anyLong())).thenReturn(false);
 
@@ -299,5 +311,113 @@ public class ProductServiceTest {
         assertThrowsExactly(ResourceNotFoundException.class, () -> productService.deleteProductByName("p1"));
 
         verify(productRepository, times(1)).existsByName(anyString());
+    }
+
+    @Test
+    public void testSetImage() {
+        final Image image = new Image(
+                1L,
+                "base64"
+        );
+
+        final Product product = new Product(
+                1L,
+                "p1",
+                "d1",
+                1.0,
+                1L,
+                ProductCategory.OTHER,
+                null
+        );
+
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
+        when(imageRepository.findById(anyLong())).thenReturn(Optional.of(image));
+
+        assertDoesNotThrow(() -> productService.setImage(1L, 1L));
+        assertEquals(image, product.getImage());
+
+        verify(imageRepository, times(1)).findById(anyLong());
+        verify(productRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    public void testSetImageException() {
+        assertThrowsExactly(ResourceNotFoundException.class, () -> productService.setImage(1L, 1L));
+
+        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrowsExactly(ResourceNotFoundException.class, () -> productService.setImage(1L, 1L));
+
+        verify(productRepository, times(2)).findById(anyLong());
+    }
+
+    @Test
+    public void testGetImage() {
+        final Image image = new Image(
+                1L,
+                "base64"
+        );
+
+        final Product product = new Product(
+                1L,
+                "p1",
+                "d1",
+                1.0,
+                1L,
+                ProductCategory.OTHER,
+                null
+        );
+
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
+
+        assertFalse(productService.getImage(1L).isPresent());
+
+        product.setImage(image);
+
+        assertTrue(productService.getImage(1L).isPresent());
+        assertEquals(ImageService.toImageDto(image), productService.getImage(1L).get());
+    }
+
+    @Test
+    public void testGetImageException() {
+        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrowsExactly(ResourceNotFoundException.class, () -> productService.getImage(1L));
+
+        verify(productRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    public void testRemoveImage() {
+        final Image image = new Image(
+                1L,
+                "base64"
+        );
+
+        final Product product = new Product(
+                1L,
+                "p1",
+                "d1",
+                1.0,
+                1L,
+                ProductCategory.OTHER,
+                null
+        );
+
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
+
+        assertDoesNotThrow(() -> productService.removeImage(1L));
+        assertNull(product.getImage());
+
+        verify(productRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    public void testRemoveImageException() {
+        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrowsExactly(ResourceNotFoundException.class, () -> productService.removeImage(1L));
+
+        verify(productRepository, times(1)).findById(anyLong());
     }
 }

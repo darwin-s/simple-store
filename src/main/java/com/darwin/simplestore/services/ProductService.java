@@ -1,10 +1,13 @@
 package com.darwin.simplestore.services;
 
+import com.darwin.simplestore.dto.ImageDto;
 import com.darwin.simplestore.dto.NewProductDto;
 import com.darwin.simplestore.dto.ProductDto;
+import com.darwin.simplestore.entities.Image;
 import com.darwin.simplestore.entities.Product;
 import com.darwin.simplestore.exceptions.ResourceExistsException;
 import com.darwin.simplestore.exceptions.ResourceNotFoundException;
+import com.darwin.simplestore.repositories.ImageRepository;
 import com.darwin.simplestore.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class used for managing products in the repository
@@ -20,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final ImageRepository imageRepository;
 
     /**
      * Create a new product
@@ -133,6 +138,48 @@ public class ProductService {
     }
 
     /**
+     * Set an image for the product
+     * @param productId The id of the product
+     * @param imageId The id of the image
+     * @throws ResourceNotFoundException If the product or the image could not be found
+     */
+    public void setImage(final Long productId, final Long imageId) throws ResourceNotFoundException {
+        final Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product with id " + productId + " does not exist"));
+        final Image image = imageRepository.findById(imageId).orElseThrow(() -> new ResourceNotFoundException("Image with id " + imageId + " does not exist"));
+
+        product.setImage(image);
+        productRepository.save(product);
+    }
+
+    /**
+     * Get the image of the product
+     * @param productId The id of the product
+     * @return The image DTO
+     * @throws ResourceNotFoundException If the product could not be found
+     */
+    public Optional<ImageDto> getImage(final Long productId) throws ResourceNotFoundException {
+        final Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product with id " + productId + " does not exist"));
+
+        if (product.getImage() == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(ImageService.toImageDto(product.getImage()));
+        }
+    }
+
+    /**
+     * Remove the image from the product
+     * @param productId the id of the product
+     * @throws ResourceNotFoundException If the product could not be found
+     */
+    public void removeImage(final Long productId) throws ResourceNotFoundException {
+        final Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product with id " + productId + " does not exist"));
+
+        product.setImage(null);
+        productRepository.save(product);
+    }
+
+    /**
      * Convert a new product DTO to an entity
      * @param newProductDto The new product DTO
      * @return A product entity, without its id set
@@ -159,7 +206,8 @@ public class ProductService {
                 productDto.description(),
                 productDto.price(),
                 productDto.quantity(),
-                productDto.category());
+                productDto.category(),
+                null);
     }
 
     /**

@@ -55,7 +55,8 @@ public class CartItemServiceTest {
                 "tstDesc",
                 1.0,
                 5L,
-                ProductCategory.OTHER
+                ProductCategory.OTHER,
+                null
         );
         emptyCart = new Cart(
                 1L,

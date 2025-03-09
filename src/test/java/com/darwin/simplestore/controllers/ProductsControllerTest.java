@@ -1,6 +1,7 @@
 package com.darwin.simplestore.controllers;
 
 import com.darwin.simplestore.config.DataWebConfig;
+import com.darwin.simplestore.dto.ImageDto;
 import com.darwin.simplestore.dto.NewProductDto;
 import com.darwin.simplestore.dto.ProductCategory;
 import com.darwin.simplestore.dto.ProductDto;
@@ -21,6 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -121,6 +123,39 @@ public class ProductsControllerTest {
     @Test
     public void testDeleteProduct() throws Exception {
         mvc.perform(delete("/products/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testSetImage() throws Exception {
+        mvc.perform(put("/products/1/image")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("imageId", "1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetImage() throws Exception {
+        final ImageDto imageDto = new ImageDto(
+                1L,
+                "base64"
+        );
+
+        when(productService.getImage(anyLong())).thenReturn(Optional.of(imageDto));
+
+        mvc.perform(get("/products/1/image"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(objectMapper.writeValueAsString(imageDto)));
+
+        when(productService.getImage(anyLong())).thenReturn(Optional.empty());
+
+        mvc.perform(get("/products/1/image"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testDeleteImage() throws Exception {
+        mvc.perform(delete("/products/1/image"))
                 .andExpect(status().isOk());
     }
 }
