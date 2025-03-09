@@ -95,27 +95,26 @@ public class OrderServiceTest {
 
     @Test
     public void testAllProductsAvailable() {
-        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+        when(cartRepository.findById(anyLong())).thenReturn(Optional.of(cart));
 
-        assertTrue(orderService.allProductsAvailable(order.getId()));
+        assertTrue(orderService.allProductsAvailable(cart.getId()));
 
         product2.setQuantity(1L);
 
-        assertFalse(orderService.allProductsAvailable(order.getId()));
+        assertFalse(orderService.allProductsAvailable(cart.getId()));
 
-        verify(orderRepository, times(2)).findById(anyLong());
+        verify(cartRepository, times(2)).findById(anyLong());
     }
 
     @Test
     public void testAllProductsAvailableException() {
-        when(orderRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertThrowsExactly(ResourceNotFoundException.class, () -> orderService.allProductsAvailable(order.getId()));
+        when(cartRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrowsExactly(ResourceNotFoundException.class, () -> orderService.allProductsAvailable(cart.getId()));
     }
 
     @Test
     public void testPlaceOrder() {
-        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+        when(cartRepository.findById(anyLong())).thenReturn(Optional.of(cart));
         doAnswer(i -> {
             final ProductDto productDto = i.getArgument(0);
             if (Objects.equals(productDto.id(), product1.getId())) {
@@ -141,7 +140,7 @@ public class OrderServiceTest {
         assertEquals(0L, product1.getQuantity());
         assertEquals(1L, product2.getQuantity());
 
-        verify(cartRepository, times(1)).findById(anyLong());
+        verify(cartRepository, times(2)).findById(anyLong());
         verify(cartService, times(1)).getCart(anyLong());
         verify(cartService, times(1)).clearCart(anyLong());
         verify(productService, times(2)).updateProductById(any(ProductDto.class));
@@ -149,7 +148,7 @@ public class OrderServiceTest {
 
     @Test
     public void testPlaceOrderException() {
-        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+        when(cartRepository.findById(anyLong())).thenReturn(Optional.of(cart));
         product2.setQuantity(1L);
 
         assertThrowsExactly(NotEnoughProductsException.class, () -> orderService.placeOrder(cart.getId()));
