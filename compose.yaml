@@ -5,5 +5,7 @@ services:
       POSTGRES_DB: ${DB_NAME:-simplestore}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USER}
+    env_file:
+      - .env
     ports:
       - '${DB_PORT:-5432}:${DB_PORT:-5432}'
