@@ -1,4 +1,4 @@
-# Simple store backend [![Java CI](https://github.com/darwin-s/simple-store/actions/workflows/gradle.yml/badge.svg)](https://github.com/darwin-s/simple-store/actions/workflows/gradle.yml)
+# Simple store backend [![Java CI CD](https://github.com/darwin-s/simple-store/actions/workflows/gradle-ghcr-cicd.yml/badge.svg)](https://github.com/darwin-s/simple-store/actions/workflows/gradle-ghcr-cicd.yml)
 This  project is a small and simple backend project for a web store. It allows 
 the creation of products, carts and orders and assignation of images to
 products
