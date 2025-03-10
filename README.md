@@ -36,6 +36,19 @@ Here is a short guide on how to run this project on your pc:
 Inside the root directory of the project run
 ``.\gradlew bootRun --args='--spring.profiles.active=dev'``.
 This command starts the backend with the dev profile active
+## Using the docker container
+In order to use the docker container, you only need docker installed.
+First you have to build image with ``docker build -t simple-store:latest .``
+
+And then run the image, while defining the needed environment variables (see [.env.template](.env.template)).
+Any arguments added to the end will be appended to the program (useful for setting spring boot profiles)
+### Running using .env file
+If you have an .env file, then in order to run the container just do
+``docker run --name simple-store-backend --env-file LOCATION_OF_ENV_FILE -p 8080:8080 simple-store:latest``
+## Running without .env file
+If you do not have an .env file, then you will have to define all the needed environment variables yourself.
+Here is how to run the container without an .env file:
+``docker run --name simple-store-backend -e ENV_VAR1=VAL1 -e ENV_VAR2=VAL2 ... -p 8080:8080 simple-store:latest``
 
 # 📡 API Documentation
 - The API is documented using **Swagger**
