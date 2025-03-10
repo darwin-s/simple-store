@@ -5,7 +5,11 @@ import com.darwin.simplestore.dto.CartItemDto;
 import com.darwin.simplestore.exceptions.ResourceNotFoundException;
 import com.darwin.simplestore.services.CartItemService;
 import com.darwin.simplestore.services.CartService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -18,6 +22,7 @@ import java.net.URI;
 @RestController
 @RequestMapping("/carts")
 @RequiredArgsConstructor
+@Tag(name = "Carts", description = "Endpoints for managing carts")
 public class CartController {
     private final CartService cartService;
     private final CartItemService cartItemService;
@@ -26,7 +31,8 @@ public class CartController {
      * Create a new cart
      * @return DTO representing the created cart
      */
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Create cart", description = "Creates a new empty cart")
     public ResponseEntity<CartDto> createCart() {
         final CartDto cartDto = cartService.createCart();
         final URI location = ServletUriComponentsBuilder
@@ -47,9 +53,15 @@ public class CartController {
      * @throws ResourceNotFoundException If the cart or the product could not be found
      */
     @PostMapping("/{cartId}/add")
-    public ResponseEntity<Void> addCartItem(@PathVariable final Long cartId,
-                                            @RequestParam final Long productId,
-                                            @RequestParam final Long quantity) throws ResourceNotFoundException {
+    @Operation(summary = "Add cart item", description = "Add a new item to a cart")
+    public ResponseEntity<Void> addCartItem(
+            @Parameter(description = "The id of the cart", example = "1")
+            @PathVariable final Long cartId,
+            @Parameter(description = "The id of the product", example = "1")
+            @RequestParam final Long productId,
+            @Parameter(description = "The quantity of the product to add", example = "5")
+            @RequestParam final Long quantity) throws ResourceNotFoundException {
+
         cartItemService.addProductToCart(cartId, productId, quantity);
         return ResponseEntity.ok().build();
     }
@@ -60,8 +72,12 @@ public class CartController {
      * @return DTO representing the cart
      * @throws ResourceNotFoundException If the cart could not be found
      */
-    @GetMapping("/{cartId}")
-    public ResponseEntity<CartDto> getCart(@PathVariable final Long cartId) throws ResourceNotFoundException {
+    @GetMapping(value = "/{cartId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get cart", description = "Retrieve and return an existing cart")
+    public ResponseEntity<CartDto> getCart(
+            @Parameter(description = "The id of the cart", example = "1")
+            @PathVariable final Long cartId) throws ResourceNotFoundException {
+
         return ResponseEntity.ok().body(cartService.getCart(cartId));
     }
 
@@ -72,8 +88,13 @@ public class CartController {
      * @return Cart item
      * @throws ResourceNotFoundException If the cart or the product could not be found
      */
-    @GetMapping("/{cartId}/{productId}")
-    public ResponseEntity<CartItemDto> getCartItem(@PathVariable final Long cartId, @PathVariable final Long productId) throws ResourceNotFoundException {
+    @GetMapping(value = "/{cartId}/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get cart item", description = "Retrieve and return an item from teh cart")
+    public ResponseEntity<CartItemDto> getCartItem(
+            @Parameter(description = "The id of the cart", example = "1")
+            @PathVariable final Long cartId,
+            @Parameter(description = "The id of the product", example = "1")
+            @PathVariable final Long productId) throws ResourceNotFoundException {
         return ResponseEntity.ok().body(cartItemService.getCartItem(cartId, productId));
     }
 
@@ -84,7 +105,11 @@ public class CartController {
      * @throws ResourceNotFoundException If the cart could not be found
      */
     @PostMapping("/{cartId}/clear")
-    public ResponseEntity<Void> clearCart(@PathVariable final Long cartId) throws ResourceNotFoundException {
+    @Operation(summary = "Clear cart", description = "Clears a cart, and leaves it empty")
+    public ResponseEntity<Void> clearCart(
+            @Parameter(description = "The id of the cart", example = "1")
+            @PathVariable final Long cartId) throws ResourceNotFoundException {
+
         cartService.clearCart(cartId);
 
         return ResponseEntity.ok().build();
@@ -99,9 +124,15 @@ public class CartController {
      * @throws ResourceNotFoundException If the cart or the product could not be found
      */
     @PutMapping("/{cartId}/{productId}")
-    public ResponseEntity<Void> updateQuantity(@PathVariable final Long cartId,
-                                               @PathVariable final Long productId,
-                                               @RequestParam final Long quantity) throws ResourceNotFoundException {
+    @Operation(summary = "Update quantity", description = "Updates the quantity of a cart item")
+    public ResponseEntity<Void> updateQuantity(
+            @Parameter(description = "The id of the cart", example = "1")
+            @PathVariable final Long cartId,
+            @Parameter(description = "The id of the product", example = "1")
+            @PathVariable final Long productId,
+            @Parameter(description = "The new quantity of the product", example = "4")
+            @RequestParam final Long quantity) throws ResourceNotFoundException {
+
         cartItemService.updateItemQuantity(cartId, productId, quantity);
 
         return ResponseEntity.ok().build();
@@ -114,7 +145,11 @@ public class CartController {
      * @throws ResourceNotFoundException If the cart could not be found
      */
     @DeleteMapping("/{cartId}")
-    public ResponseEntity<Void> deleteCart(@PathVariable final Long cartId) throws ResourceNotFoundException {
+    @Operation(summary = "Delete cart", description = "Clear and then delete a cart")
+    public ResponseEntity<Void> deleteCart(
+            @Parameter(description = "The id of the cart", example = "1")
+            @PathVariable final Long cartId) throws ResourceNotFoundException {
+
         cartService.deleteCart(cartId);
 
         return ResponseEntity.ok().build();
@@ -128,7 +163,13 @@ public class CartController {
      * @throws ResourceNotFoundException If the cart or the product could not be found
      */
     @DeleteMapping("/{cartId}/{productId}")
-    public ResponseEntity<Void> deleteItem(@PathVariable final Long cartId, @PathVariable final Long productId) throws ResourceNotFoundException {
+    @Operation(summary = "Delete cart item", description = "Delete a product from the cart")
+    public ResponseEntity<Void> deleteItem(
+            @Parameter(description = "The id of the cart", example = "1")
+            @PathVariable final Long cartId,
+            @Parameter(description = "The id of the product", example = "1")
+            @PathVariable final Long productId) throws ResourceNotFoundException {
+
         cartItemService.deleteItem(cartId, productId);
 
         return ResponseEntity.ok().build();

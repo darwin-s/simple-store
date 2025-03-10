@@ -5,7 +5,11 @@ import com.darwin.simplestore.exceptions.BadOrderStateException;
 import com.darwin.simplestore.exceptions.NotEnoughProductsException;
 import com.darwin.simplestore.exceptions.ResourceNotFoundException;
 import com.darwin.simplestore.services.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -18,6 +22,7 @@ import java.net.URI;
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
+@Tag(name = "Orders", description = "Endpoints for managing orders")
 public class OrderController {
     private final OrderService orderService;
 
@@ -28,8 +33,12 @@ public class OrderController {
      * @throws ResourceNotFoundException If the cart could not be found
      * @throws NotEnoughProductsException If there are not enough products to satisfy the order
      */
-    @PostMapping
-    public ResponseEntity<OrderDto> placeOrder(@RequestParam final Long cartId) throws ResourceNotFoundException, NotEnoughProductsException {
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Place order", description = "Places a new order from a cart, and clears teh cart")
+    public ResponseEntity<OrderDto> placeOrder(
+            @Parameter(description = "The id of the cart", example = "1")
+            @RequestParam final Long cartId) throws ResourceNotFoundException, NotEnoughProductsException {
+
         final OrderDto orderDto = orderService.placeOrder(cartId);
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -46,8 +55,11 @@ public class OrderController {
      * @return The DTO representing the order
      * @throws ResourceNotFoundException If the order could not be found
      */
-    @GetMapping("/{orderId}")
-    public ResponseEntity<OrderDto> getOrder(@PathVariable final Long orderId) throws ResourceNotFoundException {
+    @GetMapping(value = "/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get order", description = "Retrieve and return an existing order")
+    public ResponseEntity<OrderDto> getOrder(
+            @Parameter(description = "The id of the order", example = "1")
+            @PathVariable final Long orderId) throws ResourceNotFoundException {
         return ResponseEntity.ok(orderService.getOrder(orderId));
     }
 
@@ -58,7 +70,11 @@ public class OrderController {
      * @throws ResourceNotFoundException If the order could not be found
      */
     @PostMapping("/{orderId}/pay")
-    public ResponseEntity<Void> payOrder(@PathVariable final Long orderId) throws ResourceNotFoundException {
+    @Operation(summary = "Pay order", description = "pay for an order, then change it's status to delivered")
+    public ResponseEntity<Void> payOrder(
+            @Parameter(description = "The id of the order", example = "1")
+            @PathVariable final Long orderId) throws ResourceNotFoundException {
+
         orderService.payOrder(orderId);
 
         return ResponseEntity.ok().build();
@@ -71,7 +87,11 @@ public class OrderController {
      * @throws ResourceNotFoundException If the order could not be found
      */
     @DeleteMapping("/{orderId}")
-    public ResponseEntity<Void> cancelOrder(@PathVariable final Long orderId) throws ResourceNotFoundException {
+    @Operation(summary = "Cancel order", description = "Cancel and delete an order")
+    public ResponseEntity<Void> cancelOrder(
+            @Parameter(description = "The id of the order", example = "1")
+            @PathVariable final Long orderId) throws ResourceNotFoundException {
+
         orderService.cancelOrder(orderId);
 
         return ResponseEntity.ok().build();
@@ -85,7 +105,11 @@ public class OrderController {
      * @throws BadOrderStateException If the order was not delivered yet
      */
     @PostMapping("/{orderId}/finish")
-    public ResponseEntity<Void> finishOrder(@PathVariable final Long orderId) throws ResourceNotFoundException, BadOrderStateException {
+    @Operation(summary = "Finish an order", description = "Finish an order that is delivered")
+    public ResponseEntity<Void> finishOrder(
+            @Parameter(description = "The id of the order", example = "1")
+            @PathVariable final Long orderId) throws ResourceNotFoundException, BadOrderStateException {
+
         orderService.finishOrder(orderId);
 
         return ResponseEntity.ok().build();

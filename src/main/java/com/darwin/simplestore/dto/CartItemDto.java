@@ -1,11 +1,18 @@
 package com.darwin.simplestore.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Record representing a cart item
  * @param id The id of the cart item
  * @param productDto The DTO of the product
  * @param quantity The quantity of the product
  */
-public record CartItemDto(Long id,
-                          ProductDto productDto,
-                          Long quantity) { }
+@Schema(description = "An existing cart item")
+public record CartItemDto(
+        @Schema(description = "The id of the cart item", example = "1")
+        Long id,
+        @Schema(description = "The product associated with the cart item")
+        ProductDto productDto,
+        @Schema(description = "The quantity of the product")
+        Long quantity) { }
