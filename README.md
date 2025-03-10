@@ -16,6 +16,7 @@ products
 - **Spring boot**
 - **Docker**
 - **Gradle**
+- **PostgreSQL**
 
 # 📥 Installation
 ## Prerequisites
