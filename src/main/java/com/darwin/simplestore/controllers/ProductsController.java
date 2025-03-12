@@ -7,6 +7,7 @@ package com.darwin.simplestore.controllers;
 
 import com.darwin.simplestore.dto.ImageDto;
 import com.darwin.simplestore.dto.NewProductDto;
+import com.darwin.simplestore.dto.ProductCategory;
 import com.darwin.simplestore.dto.ProductDto;
 import com.darwin.simplestore.exceptions.ResourceExistsException;
 import com.darwin.simplestore.exceptions.ResourceNotFoundException;
@@ -43,6 +44,7 @@ public class ProductsController {
      * @param pageSize The size of the page
      * @param sortBy Field inside the product object to sort by
      * @param ascending If true sorts ascending, otherwise sorts descending
+     * @param category If present filters the products by a category
      * @return A page of product DTOs
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,12 +57,21 @@ public class ProductsController {
         @Parameter(description = "The field to sort the products by", example = "name")
         @RequestParam(defaultValue = "name") final String sortBy,
         @Parameter(description = "Whether to sort the page in ascending order", example = "true")
-        @RequestParam(defaultValue = "true") final Boolean ascending
+        @RequestParam(defaultValue = "true") final Boolean ascending,
+        @Parameter(description = "The category of products to find", example = "FOOD")
+        @RequestParam(required = false) final ProductCategory category
     ) {
-        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by("name").descending();
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, pageSize, sort);
+        Page<ProductDto> result = null;
 
-        return ResponseEntity.ok(productService.getProducts(pageable));
+        if (category == null) {
+            result = productService.getProducts(pageable);
+        } else {
+            result = productService.getProductsByCategory(pageable, category);
+        }
+
+        return ResponseEntity.ok(result);
     }
 
     /**

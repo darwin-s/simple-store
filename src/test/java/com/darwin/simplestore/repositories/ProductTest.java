@@ -14,6 +14,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -77,10 +81,15 @@ class ProductTest {
         product.setCategory(ProductCategory.OTHER);
         productRepository.save(product);
 
-        List<Product> products = productRepository.findByCategory(ProductCategory.OTHER);
+        final Pageable pageable = PageRequest.of(0, 10, Sort.by("id"));
+        Page<Product> productsPage = productRepository.findByCategory(pageable, ProductCategory.OTHER);
+        List<Product> products = productsPage.getContent();
         assertEquals(2, products.size());
         assertEquals("unique", products.getFirst().getName());
         assertEquals("test", products.getLast().getName());
+
+        productsPage = productRepository.findByCategory(pageable, ProductCategory.FOOD);
+        assertEquals(0, productsPage.getTotalElements());
     }
 
     @Test

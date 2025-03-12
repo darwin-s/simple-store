@@ -7,6 +7,8 @@ package com.darwin.simplestore.repositories;
 
 import com.darwin.simplestore.dto.ProductCategory;
 import com.darwin.simplestore.entities.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.Optional;
  */
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByName(String name);
-    List<Product> findByCategory(ProductCategory category);
+    Page<Product> findByCategory(Pageable pageable, ProductCategory category);
     boolean existsByName(String name);
     void deleteByName(String name);
 }

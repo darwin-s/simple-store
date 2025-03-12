@@ -15,6 +15,7 @@ import com.darwin.simplestore.repositories.CartRepository;
 import com.darwin.simplestore.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Objects;
 
@@ -23,6 +24,7 @@ import java.util.Objects;
  */
 @Service
 @RequiredArgsConstructor
+@Validated
 public class CartItemService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;

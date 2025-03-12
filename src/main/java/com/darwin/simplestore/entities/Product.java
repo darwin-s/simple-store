@@ -7,6 +7,9 @@ package com.darwin.simplestore.entities;
 
 import com.darwin.simplestore.dto.ProductCategory;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 /**
@@ -23,15 +26,20 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @NotNull(message = "Product name cannot be null")
+    @NotEmpty(message = "Product name cannot be empty")
     private String name;
 
+    @Size(max = 4096, message = "Product description can be at most 4096 characters long")
     @Column(length = 4096)
     private String description;
+
+    @NotNull(message = "Product price cannot be null")
     private Double price;
+
+    @NotNull(message = "Product quantity cannot be null")
     private Long quantity;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductCategory category;
 

@@ -18,7 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @OpenAPIDefinition(
         info = @Info(
                 title = "Simple Store",
-                version = "1.0",
+                version = "1.1.0",
                 description = "A simple store API",
                 license = @License(
                         name = "MIT License",

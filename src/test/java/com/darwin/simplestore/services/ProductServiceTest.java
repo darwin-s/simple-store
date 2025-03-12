@@ -218,6 +218,51 @@ public class ProductServiceTest {
     }
 
     @Test
+    public void testGetProductByCategory() {
+        final Product p1 = new Product(
+                1L,
+                "p1",
+                "d1",
+                1.0,
+                2L,
+                ProductCategory.OTHER,
+                null);
+        final Product p2 = new Product(
+                2L,
+                "p2",
+                "d2",
+                1.0,
+                2L,
+                ProductCategory.OTHER,
+                null);
+
+        final Pageable pageable1 = PageRequest.of(0, 1);
+        final Pageable pageable2 = PageRequest.of(1, 1);
+        final Page<Product> p1Page = new PageImpl<>(List.of(p1), pageable1, 1);
+        final Page<Product> p2Page = new PageImpl<>(List.of(p2), pageable2, 1);
+        final Page<Product> emptyPage = new PageImpl<>(List.of(), pageable1, 0);
+
+        when(productRepository.findByCategory(pageable1, ProductCategory.OTHER)).thenReturn(p1Page);
+        when(productRepository.findByCategory(pageable2, ProductCategory.OTHER)).thenReturn(p2Page);
+        when(productRepository.findByCategory(any(Pageable.class), eq(ProductCategory.CLOTHES))).thenReturn(emptyPage);
+
+        Page<ProductDto> firstPage = productService.getProductsByCategory(pageable1, ProductCategory.OTHER);
+
+        assertEquals(1, firstPage.getNumberOfElements());
+        assertEquals(1L, firstPage.get().findFirst().get().id());
+
+        Page<ProductDto> secondPage = productService.getProductsByCategory(pageable2, ProductCategory.OTHER);
+
+        assertEquals(1, secondPage.getNumberOfElements());
+        assertEquals(2L, secondPage.get().findFirst().get().id());
+
+        Page<ProductDto> thirdPage = productService.getProductsByCategory(pageable1, ProductCategory.CLOTHES);
+        assertEquals(0, thirdPage.getNumberOfElements());
+
+        verify(productRepository, times(3)).findByCategory(any(Pageable.class), any(ProductCategory.class));
+    }
+
+    @Test
     public void testUpdateProductById() {
         final Product product = mock(Product.class);
         when(product.getId()).thenReturn(1L);

@@ -12,12 +12,14 @@ import com.darwin.simplestore.exceptions.ResourceNotFoundException;
 import com.darwin.simplestore.repositories.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Service class for managing images
  */
 @Service
 @RequiredArgsConstructor
+@Validated
 public class ImageService {
     private final ImageRepository imageRepository;
 
