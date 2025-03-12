@@ -6,6 +6,9 @@
 package com.darwin.simplestore.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +28,9 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotNull(message = "Image content cannot be null")
+    @NotEmpty(message = "Image content cannot be empty")
+    @Size(max = 4194304, message = "Image content can be maximum 4194304 bytes")
     @Column(length = 4194304)
     private String base64Image;
 }
