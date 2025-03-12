@@ -13,6 +13,7 @@ import com.darwin.simplestore.repositories.CartItemRepository;
 import com.darwin.simplestore.repositories.CartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Validated
 public class CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;

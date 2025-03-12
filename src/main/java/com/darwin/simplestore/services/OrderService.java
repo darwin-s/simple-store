@@ -17,6 +17,7 @@ import com.darwin.simplestore.repositories.CartRepository;
 import com.darwin.simplestore.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Set;
 
@@ -25,6 +26,7 @@ import java.util.Set;
  */
 @Service
 @RequiredArgsConstructor
+@Validated
 public class OrderService {
     private final OrderRepository orderRepository;
     private final CartService cartService;
