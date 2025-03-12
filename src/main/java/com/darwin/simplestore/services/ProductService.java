@@ -7,6 +7,7 @@ package com.darwin.simplestore.services;
 
 import com.darwin.simplestore.dto.ImageDto;
 import com.darwin.simplestore.dto.NewProductDto;
+import com.darwin.simplestore.dto.ProductCategory;
 import com.darwin.simplestore.dto.ProductDto;
 import com.darwin.simplestore.entities.Image;
 import com.darwin.simplestore.entities.Product;
@@ -85,6 +86,16 @@ public class ProductService {
      */
     public ProductDto getProductByName(final String name) throws ResourceNotFoundException {
         return toProductDto(productRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("Product with name " + name + " not found")));
+    }
+
+    /**
+     * Get products by category
+     * @param pageable The pageable for the request
+     * @param category The product category
+     * @return Page of products of certain category
+     */
+    public Page<ProductDto> getProductsByCategory(final Pageable pageable, final ProductCategory category) {
+        return productRepository.findByCategory(pageable, category).map(ProductService::toProductDto);
     }
 
     /**

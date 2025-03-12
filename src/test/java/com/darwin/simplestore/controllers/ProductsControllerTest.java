@@ -84,6 +84,23 @@ public class ProductsControllerTest {
     }
 
     @Test
+    public void testGetProductsPageByCategory() throws Exception {
+        when(productService.getProductsByCategory(any(Pageable.class), eq(ProductCategory.OTHER))).thenReturn(new PageImpl<>(List.of(productDto)));
+        when(productService.getProductsByCategory(any(Pageable.class), eq(ProductCategory.CLOTHES))).thenReturn(new PageImpl<>(List.of()));
+
+        mvc.perform(get("/products")
+                .param("category", ProductCategory.OTHER.name()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(1L));
+
+        mvc.perform(get("/products")
+                .param("category", ProductCategory.CLOTHES.name()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements").value(0));
+    }
+
+    @Test
     public void testCreateProduct() throws Exception {
         when(productService.createProduct(any(NewProductDto.class))).thenAnswer(i -> {
            final NewProductDto productDto = i.getArgument(0);
