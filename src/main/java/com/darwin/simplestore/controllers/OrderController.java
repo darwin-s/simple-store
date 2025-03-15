@@ -25,6 +25,7 @@ import java.net.URI;
  * Controller for managing orders
  */
 @RestController
+@CrossOrigin
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 @Tag(name = "Orders", description = "Endpoints for managing orders")

@@ -25,6 +25,7 @@ import java.net.URI;
  * Controller for managing carts and their items
  */
 @RestController
+@CrossOrigin
 @RequestMapping("/carts")
 @RequiredArgsConstructor
 @Tag(name = "Carts", description = "Endpoints for managing carts")

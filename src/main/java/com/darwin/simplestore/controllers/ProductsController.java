@@ -32,6 +32,7 @@ import java.util.Optional;
  * Controller for managing products
  */
 @RestController
+@CrossOrigin
 @RequestMapping("products")
 @RequiredArgsConstructor
 @Tag(name = "Products", description = "Endpoints for managing products")

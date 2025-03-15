@@ -24,6 +24,7 @@ import java.net.URI;
  * Controller for images
  */
 @RestController
+@CrossOrigin
 @RequestMapping("/images")
 @RequiredArgsConstructor
 @Tag(name = "Images", description = "Endpoints for managing images")
